@@ -16,7 +16,6 @@ bot = telebot.TeleBot(TOKEN)
 user_balances = {}
 addbal_state = {}
 lucky_users = set()
-banned_users = set()
 user_games = {}
 user_mines_states = {}
 user_aviator = {}
@@ -26,8 +25,6 @@ user_states = {}
 user_referred_by = {}
 tic_tac_toe_states = {}
 user_chicken_states = {}
-COEFS = [1.1, 1.3, 1.6, 2.0, 2.5, 3.1, 3.8, 4.6, 5.5, 6.5]
-RISKS = [0.05, 0.07, 0.1, 0.15, 0.22, 0.3, 0.4, 0.55, 0.7, 0.85]
 ADMIN_ID = "5815294733"
 
 cancel_commands = [
@@ -78,24 +75,6 @@ def back_to_main_menu(message):
     markup.add('💰 Balance', '💸 Pul chiqarish')
     markup.add('💳 Hisob toldirish', '🎁 Kunlik bonus', '👥 Referal link')
     bot.send_message(message.chat.id, "🔙 Asosiy menyu:", reply_markup=markup)
-
-
-@bot.message_handler(commands=['ban'])
-def ban_user(message):
-    if message.from_user.id != ADMIN_ID:
-        return
-    try:
-        uid = int(message.text.split()[1])
-        banned_users.add(uid)
-        bot.send_message(message.chat.id, f"⛔ {uid} ban qilindi.")
-    except:
-        bot.send_message(message.chat.id, "❗ ID noto‘g‘ri.")
-
-@bot.message_handler(func=lambda m: True)
-def check_ban(message):
-    if message.from_user.id in banned_users:
-        return bot.send_message(message.chat.id, "🚫 Sizga botdan foydalanish taqiqlangan.")
-
 
 
 @bot.message_handler(func=lambda m: m.text == "💰 Balance")
@@ -595,13 +574,6 @@ def handle_mines_click(call):
         user_mines_states.pop(user_id)
         return
 
-    state["opened"].append(index)
-    # Multiplikatorni yangilash
-    if step < len(COEFS):
-        state["multiplier"] = COEFS[step]
-    else:
-        state["multiplier"] *= 1.25
-
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     send_mines_grid(call.message.chat.id, user_id)
     
@@ -782,6 +754,9 @@ def chicken_stop(call):
             call.message.chat.id,
             call.message.message_id
         )
+        
+COEFS = [1.1, 1.3, 1.6, 2.0, 2.5, 3.1, 3.8, 4.6, 5.5, 6.5]
+RISKS = [0.05, 0.07, 0.1, 0.15, 0.22, 0.3, 0.4, 0.55, 0.7, 0.85]
 
 
 print("Bot ishga tushdi...")
